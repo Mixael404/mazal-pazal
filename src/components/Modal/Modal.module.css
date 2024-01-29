@@ -1,0 +1,72 @@
+.title{
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.close{
+   color: #00786A;
+   font-size: 24px;
+   font-weight: bold;
+   padding: 10px;
+   cursor: pointer;
+   position: absolute;
+   top: 0;
+   right: 0;
+}
+
+.close:hover{
+    background-color: #e2e2e2;
+}
+
+.modal__bg{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(175, 175, 175, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal__body{
+    width: 400px;
+    min-height: 400px;
+    background-color: white;
+    padding: 10px;
+    position: relative;
+}
+.modal__body form{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.modal__body form input, .modal__body form textarea, .modal__body form select{
+    width: 70%;
+    padding: 6px;
+}
+
+.submit{
+    background-color: #00786A;
+    border: none;
+    padding: 6px;
+    border-radius: 10px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 200ms ease-in-out;
+}
+
+.submit:hover{
+    transform: scale(1.1,1.1);
+}
+
+
+.emptySelect{
+    border: 2px solid red;
+}

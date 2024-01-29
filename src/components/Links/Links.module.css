@@ -1,0 +1,32 @@
+.links_bg{
+    background-color: #f4f4f4;
+    padding: 0;
+    margin-bottom: 10px;
+}
+
+.links{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 30px;
+}
+.links a{
+    text-align: center;
+    color: #00786A;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all 300ms ease-in-out;
+}
+.links a:hover{
+    font-size: 24px;
+}
+
+@media(min-width: 768px){
+    .links_bg{
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    .links a{
+        font-size: 22px;
+    }
+}
