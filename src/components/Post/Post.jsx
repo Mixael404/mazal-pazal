@@ -1,6 +1,29 @@
 import classes from './Post.module.css';
 
 export default function Post(props){
+
+    let description = props.description;
+    let shortcattedDescription;
+    if(description.length > 200){
+        shortcattedDescription = description.slice(0, 199).split('');
+        for(let i = 197; i < 200; i++){
+            shortcattedDescription[i] = '.';
+        }
+        shortcattedDescription.join('');
+    }
+    
+    function deletePost(e){
+        // Temporary by name TODO: Add id
+        const postName = props.name;
+        fetch('http://back.ru/delete.php', {
+            method: "POST",
+            body: postName,
+        })
+            .then((res) => res.text())
+            .then((res) => console.log(res))
+            .then(() => props.updateList((prev => !prev)))
+    }
+
     return(
         <div className={classes.post}>
             <div className={classes.header}>
@@ -19,16 +42,20 @@ export default function Post(props){
                     <h4
                     className={classes.name}
                     >{ props.name }</h4>
-                    <h4>{ props.date }</h4>
+                    <h4>{ props.created_at }</h4>
                 </div>
                 <p className={classes.body__description}>
-                    {props.description}
+                    {props.description.length <= 200 ? props.description : shortcattedDescription}
                 </p>
                 <p className={classes.price}>
                     {props.price ?? "-"}
                 </p>
                 <div className={classes.body__footer}>
                     <h4> {props.phone} </h4>
+                    <h4 
+                    className={classes.delete}
+                    onClick={deletePost}
+                    >Delete</h4>
                     <h4 className={classes.more}> More </h4>
                 </div>  
             </div>

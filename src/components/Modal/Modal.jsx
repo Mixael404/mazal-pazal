@@ -2,16 +2,14 @@ import classes from './Modal.module.css';
 import { categories, regions } from '../../data';
 import { useEffect, useState } from 'react';
 
-export default function Modal({ closeHandler }) {
+export default function Modal({ closeHandler, updateList }) {
 
 
     const [form, setForm] = useState({});
-
-
     let [emptyRegion, setRegion] = useState(false);
     const [emptyCategory, setCategory] = useState(false);
 
-
+    
 
     function handleInput(e) {
         const fieldName = e.target.name;
@@ -38,26 +36,29 @@ export default function Modal({ closeHandler }) {
     }
 
 
+
     async function addProduct(e) {
         e.preventDefault();
 
-        if(!form.category || !form.region) {
-            if(!form.category) setCategory(true);
-            if(!form.region) setRegion(true);
+        if (!form.category || !form.region) {
+            if (!form.category) setCategory(true);
+            if (!form.region) setRegion(true);
             return;
         };
 
+        let date = new Date();
+        form.createdAt = date.toLocaleDateString();
+        console.log(form);
         fetch('http://back.ru/add.php', {
             method: 'POST',
             body: JSON.stringify(form)
         })
-            .then((response) => response.text())
+            .then((response) => response.json())
             .then((response => console.log(response)))
+            .then(() => updateList((prev) => !prev))
 
         closeHandler(false);
     }
-
-
 
     return (
         <div className={classes.modal__bg}>
