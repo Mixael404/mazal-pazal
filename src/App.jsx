@@ -8,28 +8,15 @@ import AddProduct from './components/AddProduct/AddProduct';
 
 function App() {
 
-  const [data, setData] = useState([]);
   const [modal, useModal] = useState(false);
-  const [listUpdate, setlistUpdate] = useState(false);
+  const [data, setData] = useState([]);
 
-  // console.log("listUpdate ", listUpdate);
-
-  useEffect(() => {
-    async function getData() {
-      const res = await fetch('http://back.ru/getPosts.php');
-      const json = await res.json();
-      setData(json);
-      // console.log("Effect");
-    }
-    getData();
-  }, [listUpdate])
-  // console.log("Stor: ", data);
   return (
     <div className="App">
       <Header />
-      <Links></Links>
-      {!modal && <Posts data={data} buttonHandler={useModal} updateList={setlistUpdate}/>}
-      {modal && <Modal updateList={setlistUpdate} closeHandler={useModal} />}
+      <Links />
+      <Posts data={data} changeData={setData} buttonHandler={useModal} />
+      {modal && <Modal closeHandler={useModal} />}
       {modal && <AddProduct />}
     </div>
   );

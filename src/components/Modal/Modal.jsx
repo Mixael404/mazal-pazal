@@ -1,61 +1,67 @@
 import classes from './Modal.module.css';
 import { categories, regions } from '../../data';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-export default function Modal({ closeHandler, updateList }) {
-
-
-    const [form, setForm] = useState({});
+export default function Modal({ closeHandler }) {
+    let formData = new FormData();
     let [emptyRegion, setRegion] = useState(false);
     const [emptyCategory, setCategory] = useState(false);
 
-    
 
     function handleInput(e) {
         const fieldName = e.target.name;
-        setForm((prev) => ({
-            ...prev,
-            [fieldName]: e.target.value,
-        }));
+        if(formData.has(fieldName)) formData.delete(fieldName);
+        formData.append(fieldName, e.target.value);
     }
 
     function handleRegion(e) {
         setRegion(false);
-        setForm((prev) => ({
-            ...prev,
-            region: e.target.value,
-        }));
+        // setForm((prev) => ({
+        //     ...prev,
+        //     region: e.target.value,
+        // }));
+        if(formData.has('region')) formData.delete('region');
+        formData.append('region', e.target.value);
     }
 
     function handleCategory(e) {
         setCategory(false);
-        setForm((prev) => ({
-            ...prev,
-            category: e.target.value,
-        }));
+        if(formData.has('category')) formData.delete('category');
+        // setForm((prev) => ({
+        //     ...prev,
+        //     category: e.target.value,
+        // }));
+        formData.append('category', e.target.value);
     }
 
+    function handleImage(e){
+        if(formData.has('image')) formData.delete('image');
+        formData.append('image', e.target.files[0]);
+    }
 
 
     async function addProduct(e) {
         e.preventDefault();
 
-        if (!form.category || !form.region) {
-            if (!form.category) setCategory(true);
-            if (!form.region) setRegion(true);
+        if (!formData.has('category') || !formData.has('region')) {
+            if (!formData.has('category')) setCategory(true);
+            if (!formData.has('region')) setRegion(true);
             return;
         };
 
         let date = new Date();
-        form.createdAt = date.toLocaleDateString();
-        console.log(form);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        console.log(day);
+        formData.append('createdAt', formattedDate);
         fetch('http://back.ru/add.php', {
             method: 'POST',
-            body: JSON.stringify(form)
+            body: formData,
         })
-            .then((response) => response.json())
+            .then((response) => response.text())
             .then((response => console.log(response)))
-            .then(() => updateList((prev) => !prev))
 
         closeHandler(false);
     }
@@ -65,7 +71,9 @@ export default function Modal({ closeHandler, updateList }) {
             <div className={classes.modal__body}>
                 <span
                     className={classes.close}
-                    onClick={() => closeHandler(false)}
+                    onClick={() => {
+                        closeHandler(false);
+                    }}
                 > &#10006;
                 </span>
                 <h3 className={classes.title}>Add new item</h3>
@@ -129,6 +137,9 @@ export default function Modal({ closeHandler, updateList }) {
                             })
                         }
                     </select>
+                    <input type="file" 
+                    onChange={handleImage}
+                    />
                     <input
                         type="submit"
                         value={"Send"}

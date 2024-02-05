@@ -11,17 +11,17 @@ export default function Post(props){
         }
         shortcattedDescription.join('');
     }
-    
     function deletePost(e){
-        // Temporary by name TODO: Add id
-        const postName = props.name;
+        const postId = props.id;
         fetch('http://back.ru/delete.php', {
             method: "POST",
-            body: postName,
-        })
-            .then((res) => res.text())
-            .then((res) => console.log(res))
-            .then(() => props.updateList((prev => !prev)))
+            body: postId,
+        })  
+            .then(() => {
+                const newData = props.data
+                        .filter((post) => post.id !== postId)
+                props.changeData(newData);
+            })
     }
 
     return(

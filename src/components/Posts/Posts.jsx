@@ -4,23 +4,59 @@ import Post from '../Post/Post';
 import { useEffect, useState } from 'react';
 import AddButton from '../AddButton/AddButton';
 
-export default function Posts({ buttonHandler, data, updateList }) {
+export default function Posts({ buttonHandler }) {
     const [category, setCategory] = useState('');
     const [region, setRegion] = useState('');
     const [search, setSearch] = useState('');
-    // const [data, setData] = useState([]);
+    const [data, setData] = useState([]);
+    const [fetching, setFetching] = useState(true);
+    let [postsPosition, setPostsPosition] = useState([0, 4]);
+    const [allPosts, setAllPosts] = useState(false);
 
-    const stor = [];
-    console.log(data);
 
-    // useEffect(() => {
-    //     async function getData(){
-    //         const res = await fetch('http://back.ru/getPosts.php');
-    //         const json = await res.json();
-    //         setData(json);
-    //     }
-    //     getData();
-    // }, [])
+    async function getData() {
+        if(!allPosts){
+            const response = await fetch(`http://back.ru/getPosts.php?start=${postsPosition[0]}&end=${postsPosition[1]}`);
+            const json = await response.json();
+            console.log(json);
+            if (json.length === 0) {
+                alert('All!');
+                setAllPosts(true);
+                setFetching(false);
+                return;
+            };
+    
+            const length = data.length + json.length;
+            setData([...data, ...json]);
+            setPostsPosition((prev) => {
+                prev[0] = length;
+                console.log(prev);
+                return prev;
+            })
+            setFetching(false);
+        }
+    }
+
+    useEffect(() => {
+        if(fetching){
+            getData();
+        }
+    }, [fetching])
+
+    useEffect(() => {
+        document.addEventListener("scroll", scrollHandler);
+
+        return function () {
+            document.removeEventListener('scroll', scrollHandler);
+        }
+    }, [])
+
+    const scrollHandler = (e) => {
+        if(e.target.documentElement.scrollHeight - (e.target.documentElement.scrollTop + window.innerHeight) < 100){
+            setFetching(true);
+        }
+    }
+
     return (
         <section className='container'>
             <div className={classes.filtres}>
@@ -67,9 +103,15 @@ export default function Posts({ buttonHandler, data, updateList }) {
                             const isSearched = post.name.toLowerCase().includes(search.toLowerCase()) || post.description.toLowerCase().includes(search.toLowerCase());
                             if (isSelectedCategory && isSelectedRegion && isSearched) return true;
                         })
-                        .map((post, index) => <Post updateList={updateList} key={index} {...post} />)
+                        .map((post, index) => <Post changeData={setData} data={data} key={index} {...post} />)
                 }
             </div>
+            <p
+                className={classes.more}
+                onClick={getData}
+            >More
+            </p>
+
             <AddButton buttonHandler={buttonHandler}>
                 Add product
             </AddButton>
