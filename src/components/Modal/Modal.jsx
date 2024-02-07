@@ -2,7 +2,7 @@ import classes from './Modal.module.css';
 import { categories, regions } from '../../data';
 import { useState } from 'react';
 
-export default function Modal({ closeHandler }) {
+export default function Modal({ closeHandler, newPosthandler }) {
     let formData = new FormData();
     let [emptyRegion, setRegion] = useState(false);
     const [emptyCategory, setCategory] = useState(false);
@@ -10,7 +10,7 @@ export default function Modal({ closeHandler }) {
 
     function handleInput(e) {
         const fieldName = e.target.name;
-        if(formData.has(fieldName)) formData.delete(fieldName);
+        if (formData.has(fieldName)) formData.delete(fieldName);
         formData.append(fieldName, e.target.value);
     }
 
@@ -20,13 +20,13 @@ export default function Modal({ closeHandler }) {
         //     ...prev,
         //     region: e.target.value,
         // }));
-        if(formData.has('region')) formData.delete('region');
+        if (formData.has('region')) formData.delete('region');
         formData.append('region', e.target.value);
     }
 
     function handleCategory(e) {
         setCategory(false);
-        if(formData.has('category')) formData.delete('category');
+        if (formData.has('category')) formData.delete('category');
         // setForm((prev) => ({
         //     ...prev,
         //     category: e.target.value,
@@ -34,8 +34,8 @@ export default function Modal({ closeHandler }) {
         formData.append('category', e.target.value);
     }
 
-    function handleImage(e){
-        if(formData.has('image')) formData.delete('image');
+    function handleImage(e) {
+        if (formData.has('image')) formData.delete('image');
         formData.append('image', e.target.files[0]);
     }
 
@@ -54,14 +54,16 @@ export default function Modal({ closeHandler }) {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
-        console.log(day);
         formData.append('createdAt', formattedDate);
         fetch('http://back.ru/add.php', {
             method: 'POST',
             body: formData,
         })
             .then((response) => response.text())
-            .then((response => console.log(response)))
+            .then((response) => {
+                console.log(response)
+                newPosthandler(true);
+            })
 
         closeHandler(false);
     }
@@ -137,8 +139,8 @@ export default function Modal({ closeHandler }) {
                             })
                         }
                     </select>
-                    <input type="file" 
-                    onChange={handleImage}
+                    <input type="file"
+                        onChange={handleImage}
                     />
                     <input
                         type="submit"

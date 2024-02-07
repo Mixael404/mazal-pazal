@@ -4,24 +4,38 @@ import Post from '../Post/Post';
 import { useEffect, useState } from 'react';
 import AddButton from '../AddButton/AddButton';
 
+import Modal from '../Modal/Modal';
+
+
+
 export default function Posts({ buttonHandler }) {
     const [category, setCategory] = useState('');
     const [region, setRegion] = useState('');
     const [search, setSearch] = useState('');
+
     const [data, setData] = useState([]);
     const [fetching, setFetching] = useState(true);
     let [postsPosition, setPostsPosition] = useState([0, 4]);
-    const [allPosts, setAllPosts] = useState(false);
+    const [isAllPosts, setIsAllPosts] = useState(false);
 
+    const [modal, useModal] = useState(false);
+    const [newPost, setNewPost] = useState(false);
+
+    function deletePostFromList(id){
+        const dataWithoutDeletedPost = data.filter((post) =>{
+            if(post.id !== id) return true;
+        })
+        setData(dataWithoutDeletedPost);
+    }
 
     async function getData() {
-        if(!allPosts){
+        if(!isAllPosts){
             const response = await fetch(`http://back.ru/getPosts.php?start=${postsPosition[0]}&end=${postsPosition[1]}`);
             const json = await response.json();
             console.log(json);
             if (json.length === 0) {
                 alert('All!');
-                setAllPosts(true);
+                setIsAllPosts(true);
                 setFetching(false);
                 return;
             };
@@ -36,6 +50,20 @@ export default function Posts({ buttonHandler }) {
             setFetching(false);
         }
     }
+
+    async function pushAddedPostToPostList(){
+        const response = await fetch(`http://back.ru/getPosts.php?start=0&end=1`);
+        const post = await response.json();
+        console.log("First post: ", post);
+        setData([...post, ...data]);
+        setNewPost(false);
+    }
+
+    useEffect(() => {
+        if(newPost){
+            pushAddedPostToPostList()
+        }
+    }, [newPost])
 
     useEffect(() => {
         if(fetching){
@@ -52,7 +80,7 @@ export default function Posts({ buttonHandler }) {
     }, [])
 
     const scrollHandler = (e) => {
-        if(e.target.documentElement.scrollHeight - (e.target.documentElement.scrollTop + window.innerHeight) < 100){
+        if(e.target.documentElement.scrollHeight - (e.target.documentElement.scrollTop + window.innerHeight) < 50){
             setFetching(true);
         }
     }
@@ -65,7 +93,10 @@ export default function Posts({ buttonHandler }) {
                         name="category"
                         id=""
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        onChange={(e) => {
+                            setIsAllPosts(false)
+                            setCategory(e.target.value)
+                        }}
                     >
                         {
                             categories.map((category, index) => {
@@ -77,7 +108,10 @@ export default function Posts({ buttonHandler }) {
                         name="region"
                         id=""
                         value={region}
-                        onChange={(e) => setRegion(e.target.value)}
+                        onChange={(e) => {
+                            setRegion(e.target.value)
+                            setIsAllPosts(false)
+                        }}
                     >
                         {
                             regions.map((region, index) => {
@@ -103,7 +137,7 @@ export default function Posts({ buttonHandler }) {
                             const isSearched = post.name.toLowerCase().includes(search.toLowerCase()) || post.description.toLowerCase().includes(search.toLowerCase());
                             if (isSelectedCategory && isSelectedRegion && isSearched) return true;
                         })
-                        .map((post, index) => <Post changeData={setData} data={data} key={index} {...post} />)
+                        .map((post) => <Post deletePostFn={deletePostFromList} key={post.id} {...post} />)
                 }
             </div>
             <p
@@ -112,9 +146,11 @@ export default function Posts({ buttonHandler }) {
             >More
             </p>
 
-            <AddButton buttonHandler={buttonHandler}>
+            <AddButton buttonHandler={useModal}>
                 Add product
             </AddButton>
+
+            {modal && <Modal newPosthandler={setNewPost} closeHandler={useModal} />}
         </section>
     )
 }

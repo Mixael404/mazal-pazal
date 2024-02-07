@@ -11,13 +11,14 @@ function App() {
   const [modal, useModal] = useState(false);
   const [data, setData] = useState([]);
 
+
   return (
     <div className="App">
       <Header />
       <Links />
       <Posts data={data} changeData={setData} buttonHandler={useModal} />
-      {modal && <Modal closeHandler={useModal} />}
-      {modal && <AddProduct />}
+      {/* {modal && <Modal closeHandler={useModal} />} */}
+      {/* {modal && <AddProduct />} */}
     </div>
   );
 }
